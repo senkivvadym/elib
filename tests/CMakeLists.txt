@@ -37,7 +37,9 @@ add_executable(elib.test.unit
 add_executable(elib::test::unit ALIAS elib.test.unit)
 
 set(HOST_TWEAKS_INCLUDE_PATH host)
-target_include_directories(elib PUBLIC ${HOST_TWEAKS_INCLUDE_PATH})
+target_include_directories(elib PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${HOST_TWEAKS_INCLUDE_PATH}>
+)
 target_link_libraries(elib.test.unit PRIVATE elib::elib Catch2::Catch2WithMain trompeloeil::trompeloeil)
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)

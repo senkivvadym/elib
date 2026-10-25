@@ -61,8 +61,40 @@ elseif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     endif()
 endif()
 
+# install:
+include(GNUInstallDirs)
+
 install(
     TARGETS elib
-    EXPORT elib
+    EXPORT elib-targets
     FILE_SET HEADERS
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(
+    EXPORT elib-targets
+    FILE elibTargets.cmake
+    NAMESPACE elib::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/elib
+)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/elibConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+    "${PROJECT_SOURCE_DIR}/cmake/elibConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/elibConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/elib
+)
+
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/elibConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/elibConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/elib
 )

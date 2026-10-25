@@ -11,28 +11,31 @@
       }
     },
     {
+      "name": "default",
+      "displayName": "Host default (Auto-detect)",
+      "inherits": "_root-config"
+    },
+    {
       "name": "gcc",
       "displayName": "GCC (Multi-Config)",
       "inherits": "_root-config",
       "generator": "Ninja Multi-Config",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/gnu-toolchain.cmake",
-        "BUILDSYS_SANITIZER": "MaxSan"
-      }
-    },
-    {
-      "name": "msvc-17",
-      "displayName": "MSVC 17 (Multi-Config)",
-      "inherits": "_root-config",
-      "generator": "Visual Studio 17 2022",
-      "architecture": "x64",
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/msvc-toolchain.cmake",
-        "BUILDSYS_SANITIZER": "MaxSan"
+        "CMAKE_CXX_COMPILER": "g++"
       }
     }
   ],
   "buildPresets": [
+    {
+      "name": "default-debug",
+      "configurePreset": "default",
+      "configuration": "Debug"
+    },
+    {
+      "name": "default-release",
+      "configurePreset": "default",
+      "configuration": "Release"
+    },
     {
       "name": "gcc-debug",
       "configurePreset": "gcc",
@@ -42,19 +45,27 @@
       "name": "gcc-release",
       "configurePreset": "gcc",
       "configuration": "Release"
-    },
+    }
+  ],
+  "packagePresets": [
     {
-      "name": "msvc-17-debug",
-      "configurePreset": "msvc-17",
-      "configuration": "Debug"
-    },
-    {
-      "name": "msvc-17-release",
-      "configurePreset": "msvc-17",
-      "configuration": "Release"
+      "name": "source-archive",
+      "configurePreset": "default",
+      "generators": [
+        "TGZ",
+        "ZIP"
+      ]
     }
   ],
   "testPresets": [
+    {
+      "name": "default-debug",
+      "hidden": true,
+      "configurePreset": "default",
+      "configuration": "Debug",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error", "stopOnFailure": true }
+    },
     {
       "name": "gcc-debug",
       "hidden": true,
@@ -62,31 +73,24 @@
       "configuration": "Debug",
       "output": { "outputOnFailure": true },
       "execution": { "noTestsAction": "error", "stopOnFailure": true }
-    },
-    {
-      "name": "msvc-17-debug",
-      "hidden": true,
-      "configurePreset": "msvc-17",
-      "configuration": "Debug",
-      "output": { "outputOnFailure": true },
-      "execution": { "noTestsAction": "error", "stopOnFailure": true }
     }
   ],
   "workflowPresets": [
     {
-      "name": "gcc",
-      "displayName": "GCC (Debug): Config & Build",
+      "name": "default-release-package",
+      "displayName": "Host Default: Config, Build Release, and Package Source",
       "steps": [
-        { "type": "configure", "name": "gcc" },
-        { "type": "build", "name": "gcc-debug" }
+        { "type": "configure", "name": "default" },
+        { "type": "build", "name": "default-release" },
+        { "type": "package", "name": "source-archive" }
       ]
     },
     {
-      "name": "msvc",
-      "displayName": "MSVC (Debug): Config & Build",
+      "name": "gcc",
+      "displayName": "GCC: Config & Build (Debug)",
       "steps": [
-        { "type": "configure", "name": "msvc-17" },
-        { "type": "build", "name": "msvc-17-debug" }
+        { "type": "configure", "name": "gcc" },
+        { "type": "build", "name": "gcc-debug" }
       ]
     }
   ]

@@ -34,24 +34,26 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-
     - name: Configure CMake
       run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        cmake --preset default
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        -DELIB_BUILD_TESTS=ON
-        -S ${{ github.workspace }}
 
     - name: Build
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      run: cmake --build build/default --config ${{ matrix.build_type }}
 
     - name: Test
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ctest --build-config ${{ matrix.build_type }} --output-on-failure
+      run: ctest --test-dir build/default --build-config ${{ matrix.build_type }} --output-on-failure
+
+    - name: Test Install
+      # Validates that GNUInstallDirs and target exports are correctly configured
+      run: >
+        cmake --install build/default
+        --config ${{ matrix.build_type }}
+        --prefix ${{ github.workspace }}/install_test_dir
+
+    - name: Package Source
+      # Explicitly use the source config to prevent CPack from attempting binary packaging.
+      run: cpack --config build/default/CPackSourceConfig.cmake

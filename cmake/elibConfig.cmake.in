@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+# Include the exported CMake targets
+include("${CMAKE_CURRENT_LIST_DIR}/elibTargets.cmake")
+
+# Check that all required components (if any are specified by the user) are found
+check_required_components(elib)
