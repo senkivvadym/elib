@@ -22,10 +22,15 @@ namespace elib::time
     timer::on_timeout callback;
   };
 
-  std::array<timer_handle, config::max_timer_num> timers{};
+  std::array<timer_handle, config::max_timer_num> &timer_handles()
+  {
+    static std::array<timer_handle, config::max_timer_num> handles{};
+    return handles;
+  }
 
   timer_handle &get_handle(std::size_t index)
   {
+    auto &timers = timer_handles();
     static timer_handle invalid{};
 
     ELIB_ASSERT_DEBUG(index < timers.size(), "elib::time::timer: timer ID out of bounds!");
@@ -44,6 +49,7 @@ namespace elib::time
     // NOTE: make sure timer::id_type type can represent entire timers range
     static_assert(config::max_timer_num <= std::numeric_limits<timer::id_type>::max());
 
+    auto &timers = timer_handles();
     for (std::size_t index{0}; index < timers.size(); index++)
     {
       timer_handle &timer = timers[index];
@@ -86,6 +92,7 @@ namespace elib::time
   void timer::process_timers()
   {
     static std::size_t curr_index = 0;
+    auto &timers = timer_handles();
     const std::size_t init_index = curr_index;
 
     do
@@ -118,6 +125,7 @@ namespace elib::time
 
   void timer::unregister_timers()
   {
+    auto &timers = timer_handles();
     for (timer_handle& timer : timers)
       timer = timer_handle{};
   }
@@ -125,6 +133,7 @@ namespace elib::time
 
   void unregister_timer(timer::id_type id)
   {
+    auto &timers = timer_handles();
     if (id >= timers.size())
       return;
 

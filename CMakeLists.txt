@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25...4.3)
-project(elib VERSION 2.7.0 LANGUAGES CXX)
+project(elib VERSION 2.7.1 LANGUAGES CXX)
 
 if(PROJECT_IS_TOP_LEVEL)
     if(MSVC)
